@@ -39,6 +39,7 @@ export default function Verify({ onDone, compact }) {
       api(`auth/status/?request=${pending.request}`)
         .then((d) => {
           if (d.status === "code_sent") setPending({ ...pending, status: "code_sent", expires: d.expires || pending.expires });
+          // (the code field is already on screen; only the hint and the timer change)
           else if (d.status === "expired") setPending(null);
         })
         .catch(() => {});
@@ -79,31 +80,27 @@ export default function Verify({ onDone, compact }) {
         </div>
       </div>
       {error && <div className="pm-error">{error}</div>}
-      {waiting ? (
-        <>
-          <p className="pm-muted" style={{ margin: "4px 0 12px" }}>{t("linkHint")}</p>
-          {pending.bot_url && (
-            <button className="pm-btn" style={{ background: "#229ED9" }} onClick={() => openUrl(pending.bot_url)}>
-              <IonIcon icon={paperPlane} /> {t("openTelegram")}
-            </button>
-          )}
-          <p className="pm-muted" style={{ textAlign: "center", margin: "12px 0 0" }}>{t("waiting")}</p>
-        </>
-      ) : (
-        <>
-          <p className="pm-muted" style={{ margin: "4px 0 10px" }}>{t("verifyHint")}</p>
-          <input className="pm-code" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-            inputMode="numeric" autoComplete="one-time-code" placeholder="••••••" />
-          <button className="pm-btn" style={{ marginTop: 12 }} disabled={busy || code.length !== 6} onClick={verify}>{t("enter")}</button>
-        </>
+      <p className="pm-muted" style={{ margin: "4px 0 10px" }}>{waiting ? t("linkHint") : t("verifyHint")}</p>
+      {pending.bot_url && (
+        <button className="pm-btn" style={{ background: "#229ED9", marginBottom: 12 }} onClick={() => openUrl(pending.bot_url)}>
+          <IonIcon icon={paperPlane} /> {t("openTelegram")}
+        </button>
       )}
-      <button className="pm-btn ghost" style={{ marginTop: 10 }} onClick={() => setPending(null)}>{t("cancel")}</button>
+      {/* the code field is always here — the customer types the code as soon as the bot sends it */}
+      <input className="pm-code" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+        inputMode="numeric" autoComplete="one-time-code" placeholder="••••••" />
+      {waiting && <p className="pm-muted" style={{ textAlign: "center", margin: "8px 0 0", fontSize: 13 }}>{t("waiting")}</p>}
+      <button className="pm-btn" style={{ marginTop: 12 }} disabled={busy || code.length !== 6} onClick={verify}>{t("confirm2")}</button>
+      <button className="pm-link" onClick={() => setPending(null)}>{t("changePhone")}</button>
     </div>
   );
 }
 
 export function startConfirm(setPending, d, phone, purpose) {
-  // auth/start answer → saved as «pending»; opens Telegram when the chat is not linked yet
-  setPending({ request: d.request, phone, purpose, status: d.status, bot_url: d.bot_url || "", expires: d.expires });
-  if (d.status === "link_telegram" && d.bot_url) openUrl(d.bot_url);
+  // auth/start answer → saved as «pending» (the code box appears at once) and the Telegram bot opens right away —
+  // with «Start» for a new chat, or just the chat where the code has already arrived
+  const expires = d.expires || new Date(Date.now() + 15 * 60 * 1000).toISOString();
+  const botUrl = d.bot_url || (d.bot ? `https://t.me/${d.bot}` : "");
+  setPending({ request: d.request, phone, purpose, status: d.status, bot_url: botUrl, expires });
+  if (botUrl) openUrl(botUrl);
 }

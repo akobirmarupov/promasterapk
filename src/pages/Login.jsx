@@ -86,12 +86,13 @@ export default function Login() {
                 <>
                   <div className="pm-field"><label>{t("fullName")}</label>
                     <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" /></div>
-                  <button className="pm-btn" disabled={busy} onClick={() => confirm("register")}>{t("confirmTg")}</button>
+                  <button className="pm-btn" disabled={busy || phone.replace(/\D/g, "").length < 12 || !name.trim()}
+                    onClick={() => confirm("register")}>{t("confirmTg")}</button>
                 </>
               )}
               {tab === "reset" && (
                 <>
-                  <button className="pm-btn" disabled={busy} onClick={() => confirm("reset")}>{t("confirmTg")}</button>
+                  <button className="pm-btn" disabled={busy || phone.replace(/\D/g, "").length < 12} onClick={() => confirm("reset")}>{t("confirmTg")}</button>
                   <button className="pm-btn ghost" style={{ marginTop: 10 }} onClick={() => setTab("login")}>{t("cancel")}</button>
                 </>
               )}

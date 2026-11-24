@@ -1,11 +1,11 @@
 /* proMaster app look: deep forest green + fresh lime, soft cards, big rounded images. Not the website's style. */
 :root {
   color-scheme: light only; /* always light — even when the phone is in night mode */
-  --pm-forest: #0e3b1f;
+  --pm-forest: #23801c; /* main dark accent — a fresh, not-too-dark green */
   --pm-green: #37b10e;
   --pm-lime: #8bd450;
   --pm-gold: #f5b100;
-  --pm-bg: #f3f6f2;
+  --pm-bg: #ffffff;
   --pm-card: #ffffff;
   --pm-text: #142016;
   --pm-muted: #5d6b60;
@@ -18,7 +18,7 @@
   --ion-color-primary-contrast-rgb: 255, 255, 255;
   --ion-color-primary-shade: #298b0b;
   --ion-color-primary-tint: #44a824;
-  --ion-color-secondary: #0e3b1f;
+  --ion-color-secondary: #23801c;
   --ion-color-secondary-rgb: 14, 59, 31;
   --ion-color-secondary-contrast: #ffffff;
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
@@ -42,10 +42,10 @@ ion-tab-button ion-badge { --background: var(--pm-gold); --color: #1b1400; font-
 
 /* hero header of the home page */
 .pm-hero {
-  background: radial-gradient(120% 140% at 100% 0%, #2f9e0c 0%, #14532b 45%, var(--pm-forest) 100%);
+  /* fresh green at the top that melts into the white page — no visible edge */
+  background: linear-gradient(180deg, #3aa71f 0%, #4fb534 38%, #8fd277 68%, #d6efcb 86%, #ffffff 100%);
   color: #fff;
-  padding: calc(env(safe-area-inset-top) + 18px) 18px 64px;
-  border-radius: 0 0 32px 32px;
+  padding: calc(env(safe-area-inset-top) + 18px) 18px 72px;
 }
 .pm-hero h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.3px; }
 .pm-hero p { margin: 4px 0 14px; opacity: 0.85; font-size: 14px; }
@@ -68,7 +68,7 @@ ion-tab-button ion-badge { --background: var(--pm-gold); --color: #1b1400; font-
 .pm-banners::-webkit-scrollbar, .pm-hscroll::-webkit-scrollbar, .pm-chips::-webkit-scrollbar { display: none; }
 .pm-banner {
   position: relative; flex: 0 0 88%; aspect-ratio: 16 / 8; border-radius: 22px; overflow: hidden;
-  scroll-snap-align: center; background: #1f3d29; box-shadow: 0 10px 26px rgba(14, 59, 31, 0.25);
+  scroll-snap-align: center; background: #e9f5e3; box-shadow: 0 8px 22px rgba(30, 110, 30, 0.18);
 }
 .pm-banner img, .pm-banner video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .pm-banner .cap {
@@ -190,8 +190,8 @@ ion-tab-button ion-badge { --background: var(--pm-gold); --color: #1b1400; font-
 
 /* profile */
 .pm-profile-head {
-  background: linear-gradient(140deg, var(--pm-forest), #1f6a12); color: #fff; border-radius: 0 0 30px 30px;
-  padding: calc(env(safe-area-inset-top) + 24px) 20px 30px;
+  background: linear-gradient(180deg, #3aa71f 0%, #4fb534 45%, #8fd277 75%, #d6efcb 90%, #ffffff 100%); color: #fff;
+  padding: calc(env(safe-area-inset-top) + 24px) 20px 64px;
 }
 .pm-avatar {
   width: 64px; height: 64px; border-radius: 22px; background: rgba(255, 255, 255, 0.16); display: grid;
@@ -241,7 +241,7 @@ button { font-family: inherit; cursor: pointer; border: 0; }
   box-shadow: 8px 0 30px rgba(0,0,0,.18); padding-top: env(safe-area-inset-top); }
 .pm-drawer.on { transform: none; }
 .pm-drawer .top { display: flex; align-items: center; gap: 12px; padding: 22px 16px 18px; color: #fff;
-  background: linear-gradient(140deg, var(--pm-forest), #1f6b2c); }
+  background: linear-gradient(140deg, #2f9e0c, #4fb534); }
 .pm-drawer .top b { display: block; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pm-drawer .top .sub { font-size: 12.5px; opacity: .8; }
 .pm-drawer .top .pm-avatar { width: 46px; height: 46px; font-size: 20px; }
@@ -260,13 +260,13 @@ button { font-family: inherit; cursor: pointer; border: 0; }
 .pm-verify .head { display: flex; gap: 12px; align-items: center; margin-bottom: 6px; }
 .pm-verify .head b { font-size: 16.5px; }
 .pm-verify .head .ic { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; color: #fff;
-  font-size: 22px; background: linear-gradient(140deg, var(--pm-forest), var(--ion-color-primary)); flex: none; }
+  font-size: 22px; background: linear-gradient(140deg, #3aa71f, #5cc13d); flex: none; }
 .pm-verify .pm-muted { font-size: 13.5px; }
 .pm-code { width: 100%; font-size: 30px; letter-spacing: 12px; text-align: center; font-weight: 800; padding: 12px;
   border-radius: 16px; border: 2px solid var(--pm-line); background: var(--pm-bg); color: var(--pm-text); outline: none; }
 .pm-code:focus { border-color: var(--ion-color-primary); }
 .pm-login-ic { width: 76px; height: 76px; border-radius: 24px; margin: 0 auto; display: grid; place-items: center; color: #fff;
-  font-size: 34px; background: linear-gradient(140deg, var(--pm-forest), var(--ion-color-primary)); }
+  font-size: 34px; background: linear-gradient(140deg, #3aa71f, #5cc13d); }
 
 /* cards on Settings / Checkout */
 .pm-box { background: var(--pm-card); border-radius: 18px; padding: 14px 14px 16px; margin-bottom: 14px; }
@@ -288,3 +288,10 @@ button { font-family: inherit; cursor: pointer; border: 0; }
 .pm-addr span { font-size: 13.5px; color: var(--pm-muted); }
 .pm-check { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: var(--pm-muted); }
 .pm-check input { width: 20px; height: 20px; accent-color: var(--ion-color-primary); }
+
+/* white page: cards get a soft shadow + hairline so they stay visible */
+.pm-card, .pm-menu, .pm-box, .pm-order, .pm-line, .pm-summary, .pm-cat {
+  box-shadow: 0 2px 14px rgba(20, 70, 30, .08); border: 1px solid #edf2eb; }
+.pm-hero h1, .pm-hero p, .pm-hero .brand b { text-shadow: 0 1px 6px rgba(0, 60, 0, .18); }
+.pm-link { display: block; margin: 14px auto 0; background: none; color: var(--pm-muted); font-weight: 600; font-size: 14px;
+  text-decoration: underline; }

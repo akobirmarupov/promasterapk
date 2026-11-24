@@ -19,7 +19,7 @@ export function StoreProvider({ children }) {
   // the registration / password reset waiting for the Telegram code: {request, phone, purpose, expires}
   const [pending, setPendingState] = useState(() => {
     const p = load("pm-pending", null);
-    return p && new Date(p.expires) > new Date() ? p : null;
+    return p && p.expires && new Date(p.expires) > new Date() ? p : null;
   });
   const [menuOpen, setMenuOpen] = useState(false);
   const [cart, setCart] = useState(() => load("pm-cart", []));  // [{id, name, price, image, qty}]
@@ -37,7 +37,8 @@ export function StoreProvider({ children }) {
     else localStorage.removeItem("pm-pending");
     if (!pending) return undefined;
     const ms = new Date(pending.expires) - new Date();
-    const timer = setTimeout(() => setPendingState(null), Math.max(0, ms)); // forget it when it expires
+    if (!(ms > 0)) return undefined; // no/odd expiry → keep the box (the server still checks the 5 minutes)
+    const timer = setTimeout(() => setPendingState(null), ms); // forget it when it expires
     return () => clearTimeout(timer);
   }, [pending]);
   useEffect(() => {

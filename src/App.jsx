@@ -28,7 +28,7 @@ export default function App() {
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
     StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
-    StatusBar.setBackgroundColor({ color: "#0E3B1F" }).catch(() => {});
+    StatusBar.setBackgroundColor({ color: "#3AA71F" }).catch(() => {});
     SplashScreen.hide().catch(() => {});
   }, []);
   return (
