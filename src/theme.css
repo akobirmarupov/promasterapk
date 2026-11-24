@@ -370,3 +370,5 @@ body.dark .pm-notif.unread { background: #18301d; }
   font-size: 12px; font-weight: 800; display: inline-grid; place-items: center; margin-left: 8px; }
 .pm-drawer nav button .pm-count { margin-left: auto; }
 .pm-profile-head .pm-head-actions { display: flex; }
+.pm-drawer.right { left: auto; right: 0; transform: translateX(105%); box-shadow: -8px 0 30px rgba(0,0,0,.18); }
+.pm-drawer.right.on { transform: none; }

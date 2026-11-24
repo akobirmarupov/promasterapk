@@ -1,7 +1,7 @@
 // Profile: who I am, my data / orders / addresses, support, the shop's contacts.
-// Top right: 🔔 and ⋮ — the ⋮ menu holds language, dark/light mode, the info pages and «Chiqish».
+// Top right: 🔔 and ⋮ — the ⋮ menu (components/ProfileMenu) holds language, dark/light mode, info pages, «Chiqish».
 import React, { useEffect, useState } from "react";
-import { IonContent, IonIcon, IonPage, useIonActionSheet, useIonRouter } from "@ionic/react";
+import { IonContent, IonIcon, IonPage, useIonRouter } from "@ionic/react";
 import {
   callOutline, chatbubblesOutline, chevronForward, ellipsisVertical, locationOutline, logoInstagram, notificationsOutline,
   paperPlaneOutline, personOutline, receiptOutline, timeOutline,
@@ -11,46 +11,14 @@ import { api } from "../api";
 import { useStore } from "../store";
 import { Bell } from "../components/ui";
 import Verify from "../components/Verify";
+import ProfileMenu from "../components/ProfileMenu";
 
 const openUrl = (url) => Browser.open({ url }).catch(() => window.open(url, "_blank"));
-
-export function useProfileMenu() {
-  // the ⋮ menu (also used from the side menu)
-  const { t, lang, setLang, dark, setDark, customer, signOut } = useStore();
-  const router = useIonRouter();
-  const [sheet] = useIonActionSheet();
-  const chooseLang = () =>
-    sheet({
-      header: t("language"),
-      buttons: [
-        { text: `${lang === "uz" ? "✓ " : ""}O'zbekcha`, handler: () => setLang("uz") },
-        { text: `${lang === "ru" ? "✓ " : ""}Русский`, handler: () => setLang("ru") },
-        { text: t("cancel"), role: "cancel" },
-      ],
-    });
-  return () =>
-    sheet({
-      header: t("more"),
-      buttons: [
-        { text: `🌐 ${t("language")}: ${lang === "ru" ? "Русский" : "O'zbekcha"}`, handler: () => setTimeout(chooseLang, 250) },
-        { text: dark ? `☀️ ${t("lightMode")}` : `🌙 ${t("darkMode")}`, handler: () => setDark(!dark) },
-        { text: `🔔 ${t("notifications")}`, handler: () => router.push(customer ? "/notifications" : "/login") },
-        { text: `💬 ${t("support")}`, handler: () => router.push("/support") },
-        { text: `ℹ️ ${t("aboutUs")}`, handler: () => router.push("/page/about") },
-        { text: `🚚 ${t("deliveryInfo")}`, handler: () => router.push("/page/delivery") },
-        { text: `🛡 ${t("returns")}`, handler: () => router.push("/page/returns") },
-        { text: `🔒 ${t("privacy")}`, handler: () => router.push("/page/privacy") },
-        { text: `📄 ${t("offer")}`, handler: () => router.push("/page/offer") },
-        ...(customer ? [{ text: `🚪 ${t("logout")}`, role: "destructive", handler: () => signOut() }] : []),
-        { text: t("cancel"), role: "cancel" },
-      ],
-    });
-}
 
 export default function Profile() {
   const { t, lang, customer, pending, badges } = useStore();
   const router = useIonRouter();
-  const openMenu = useProfileMenu();
+  const [menu, setMenu] = useState(false);
   const [store, setStore] = useState(null);
   useEffect(() => {
     api("home/").then((d) => setStore(d.store)).catch(() => {});
@@ -73,7 +41,7 @@ export default function Profile() {
         <div className="pm-profile-head">
           <div className="pm-head-actions" style={{ justifyContent: "flex-end", marginBottom: 10 }}>
             <Bell />
-            <button className="pm-iconbtn" aria-label={t("more")} onClick={openMenu}><IonIcon icon={ellipsisVertical} /></button>
+            <button className="pm-iconbtn" aria-label={t("more")} onClick={() => setMenu(true)}><IonIcon icon={ellipsisVertical} /></button>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <div className="pm-avatar">{initials}</div>
@@ -115,6 +83,7 @@ export default function Profile() {
         )}
         <p className="pm-muted" style={{ textAlign: "center", fontSize: 12, marginBottom: 24 }}>proMaster · {t("version")} 1.2</p>
       </IonContent>
+      <ProfileMenu open={menu} onClose={() => setMenu(false)} />
     </IonPage>
   );
 }
