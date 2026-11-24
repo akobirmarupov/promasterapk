@@ -2,16 +2,17 @@ import React, { useEffect, useState } from "react";
 import { IonContent, IonIcon, IonPage, useIonRouter } from "@ionic/react";
 import {
   callOutline, chevronForward, documentTextOutline, informationCircleOutline, locationOutline, logOutOutline,
-  logoInstagram, paperPlaneOutline, receiptOutline, settingsOutline, shieldCheckmarkOutline, timeOutline,
+  logoInstagram, paperPlaneOutline, personOutline, receiptOutline, settingsOutline, shieldCheckmarkOutline, timeOutline,
 } from "ionicons/icons";
 import { Browser } from "@capacitor/browser";
 import { api } from "../api";
 import { useStore } from "../store";
+import Verify from "../components/Verify";
 
 const openUrl = (url) => Browser.open({ url }).catch(() => window.open(url, "_blank"));
 
 export default function Profile() {
-  const { t, lang, customer, signOut } = useStore();
+  const { t, lang, customer, signOut, pending } = useStore();
   const router = useIonRouter();
   const [store, setStore] = useState(null);
   useEffect(() => {
@@ -38,17 +39,25 @@ export default function Profile() {
               <div style={{ opacity: 0.8, fontSize: 14 }}>{customer ? customer.phone : t("guestHint")}</div>
             </div>
           </div>
-          {!customer && (
+          {!customer && !pending && (
             <button className="pm-btn" style={{ marginTop: 18, background: "#fff", color: "var(--pm-forest)" }} onClick={() => router.push("/login")}>
-              {t("login")}
+              {t("signIn")} / {t("register")}
             </button>
           )}
         </div>
 
+        {!customer && pending && (
+          <div style={{ margin: "16px" }}>
+            {/* came back from Telegram: the code is asked right here, the phone is not asked again */}
+            <Verify compact />
+          </div>
+        )}
+
         <div className="pm-menu">
+          <Row icon={personOutline} label={t("personal")} sub={customer ? customer.name : ""} onClick={() => router.push(customer ? "/profile/settings" : "/login")} />
           <Row icon={receiptOutline} label={t("myOrders")} onClick={() => router.push(customer ? "/profile/orders" : "/login")} />
           <Row icon={locationOutline} label={t("addresses")} onClick={() => router.push(customer ? "/profile/addresses" : "/login")} />
-          <Row icon={settingsOutline} label={t("settings")} sub={lang === "ru" ? "Русский" : "O'zbekcha"} onClick={() => router.push("/profile/settings")} />
+          <Row icon={settingsOutline} label={t("language")} sub={lang === "ru" ? "Русский" : "O'zbekcha"} onClick={() => router.push("/profile/settings")} />
         </div>
 
         {store && (
@@ -76,7 +85,7 @@ export default function Profile() {
             </button>
           </div>
         )}
-        <p className="pm-muted" style={{ textAlign: "center", fontSize: 12, marginBottom: 24 }}>proMaster · {t("version")} 1.0</p>
+        <p className="pm-muted" style={{ textAlign: "center", fontSize: 12, marginBottom: 24 }}>proMaster · {t("version")} 1.1</p>
       </IonContent>
     </IonPage>
   );

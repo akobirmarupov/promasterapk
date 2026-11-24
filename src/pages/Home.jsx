@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { IonContent, IonIcon, IonPage, IonRefresher, IonRefresherContent, useIonRouter } from "@ionic/react";
-import { searchOutline } from "ionicons/icons";
+import { menuOutline, searchOutline } from "ionicons/icons";
 import { Browser } from "@capacitor/browser";
 import { api } from "../api";
 import { useStore } from "../store";
-import { catIcon, Failed, ProductCard, Skeleton } from "../components/ui";
+import { Failed, ProductCard, Skeleton } from "../components/ui";
 
 export default function Home() {
-  const { t, lang, customer } = useStore();
+  const { t, lang, customer, setMenuOpen } = useStore();
   const router = useIonRouter();
   const [data, setData] = useState(null);
   const [failed, setFailed] = useState(false);
@@ -37,7 +37,10 @@ export default function Home() {
           <IonRefresherContent />
         </IonRefresher>
         <div className="pm-hero">
-          <div className="brand"><img src="/icon.png" alt="" /><b>proMaster</b></div>
+          <div className="brand">
+            <img src="/icon.png" alt="" /><b>proMaster</b>
+            <button className="pm-burger" aria-label={t("menu")} onClick={() => setMenuOpen(true)}><IonIcon icon={menuOutline} /></button>
+          </div>
           <h1>{t("hello")}{first ? `, ${first}` : ""}!</h1>
           <p>{lang === "ru" ? "Инструменты и хозтовары — с доставкой" : "Asbob-uskuna va xo'jalik mollari — yetkazib berish bilan"}</p>
           <div className="pm-search" onClick={() => router.push("/products?focus=1")}>
@@ -64,23 +67,8 @@ export default function Home() {
               </div>
             )}
 
-            <div className={`pm-section${data.banners.length ? "" : " pm-lift"}`}>
-              <div className="pm-section-head">
-                <h2>{t("categories")}</h2>
-                <button onClick={() => router.push("/catalog")}>{t("seeAll")}</button>
-              </div>
-              <div className="pm-cats">
-                {data.categories.slice(0, 8).map((c) => (
-                  <div key={c.id} className={`pm-cat${c.theme === "gold" ? " gold" : ""}`} onClick={() => router.push(`/products?category=${c.slug}`)}>
-                    <div className="ic"><IonIcon icon={catIcon(c.icon)} /></div>
-                    <span>{c.name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {data.sections.filter((s) => s.products.length).map((s) => (
-              <div className="pm-section" key={s.key}>
+            {data.sections.filter((s) => s.products.length).map((s, i) => (
+              <div className={`pm-section${i === 0 && !data.banners.length ? " pm-lift" : ""}`} key={s.key}>
                 <div className="pm-section-head">
                   <h2>{titles[s.key]}</h2>
                   <button onClick={() => router.push(more[s.key])}>{t("seeAll")}</button>

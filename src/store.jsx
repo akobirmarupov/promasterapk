@@ -1,4 +1,5 @@
-// App state: cart, signed-in customer, language, dark mode. Kept on the phone (localStorage).
+// App state: cart, signed-in customer, language, the unfinished Telegram confirmation, the side menu.
+// Kept on the phone (localStorage). The app is always light (no dark mode).
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { api, hasToken, setApiLang, setToken } from "./api";
 import { ERR, T } from "./i18n";
@@ -15,7 +16,12 @@ const load = (k, d) => {
 
 export function StoreProvider({ children }) {
   const [lang, setLangState] = useState(() => localStorage.getItem("pm-lang") || "uz");
-  const [dark, setDarkState] = useState(() => load("pm-dark", false));
+  // the registration / password reset waiting for the Telegram code: {request, phone, purpose, expires}
+  const [pending, setPendingState] = useState(() => {
+    const p = load("pm-pending", null);
+    return p && new Date(p.expires) > new Date() ? p : null;
+  });
+  const [menuOpen, setMenuOpen] = useState(false);
   const [cart, setCart] = useState(() => load("pm-cart", []));  // [{id, name, price, image, qty}]
   const [customer, setCustomer] = useState(null);
   const [ready, setReady] = useState(!hasToken());
@@ -23,10 +29,17 @@ export function StoreProvider({ children }) {
   setApiLang(lang);
   useEffect(() => localStorage.setItem("pm-cart", JSON.stringify(cart)), [cart]);
   useEffect(() => {
-    document.body.classList.toggle("dark", !!dark);
-    document.documentElement.classList.toggle("ion-palette-dark", !!dark);
-    localStorage.setItem("pm-dark", JSON.stringify(!!dark));
-  }, [dark]);
+    localStorage.removeItem("pm-dark"); // the old dark-mode switch is gone
+    document.body.classList.remove("dark");
+  }, []);
+  useEffect(() => {
+    if (pending) localStorage.setItem("pm-pending", JSON.stringify(pending));
+    else localStorage.removeItem("pm-pending");
+    if (!pending) return undefined;
+    const ms = new Date(pending.expires) - new Date();
+    const timer = setTimeout(() => setPendingState(null), Math.max(0, ms)); // forget it when it expires
+    return () => clearTimeout(timer);
+  }, [pending]);
   useEffect(() => {
     if (!hasToken()) return;
     api("me/").then((d) => setCustomer(d.customer)).catch(() => setCustomer(null)).finally(() => setReady(true));
@@ -40,9 +53,11 @@ export function StoreProvider({ children }) {
       lang,
       t,
       tErr,
-      dark,
       ready,
-      setDark: setDarkState,
+      pending,
+      setPending: setPendingState,
+      menuOpen,
+      setMenuOpen,
       setLang(l) {
         localStorage.setItem("pm-lang", l);
         setApiLang(l);
@@ -69,6 +84,7 @@ export function StoreProvider({ children }) {
       signIn(token, c) {
         setToken(token);
         setCustomer(c);
+        setPendingState(null);
         if (c && c.lang && c.lang !== lang) {
           localStorage.setItem("pm-lang", c.lang);
           setLangState(c.lang);
@@ -84,7 +100,7 @@ export function StoreProvider({ children }) {
         setCustomer(null);
       },
     }),
-    [lang, t, tErr, dark, ready, cart, customer]
+    [lang, t, tErr, ready, pending, menuOpen, cart, customer]
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

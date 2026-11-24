@@ -21,18 +21,20 @@ import Orders from "./pages/Orders";
 import Addresses from "./pages/Addresses";
 import Settings from "./pages/Settings";
 import TextPage from "./pages/TextPage";
+import Drawer from "./components/Drawer";
 
 export default function App() {
-  const { t, count, dark } = useStore();
+  const { t, count } = useStore();
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
     StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
     StatusBar.setBackgroundColor({ color: "#0E3B1F" }).catch(() => {});
     SplashScreen.hide().catch(() => {});
-  }, [dark]);
+  }, []);
   return (
     <IonApp>
       <IonReactRouter>
+        <Drawer />
         <IonTabs>
           <IonRouterOutlet>
             <Route exact path="/home" component={Home} />
