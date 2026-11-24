@@ -4,7 +4,7 @@ import { bagAddOutline, checkmarkCircle, flashOutline, shareSocialOutline } from
 import { useParams } from "react-router-dom";
 import { api } from "../api";
 import { useStore } from "../store";
-import { Failed, Price, ProductCard, Skeleton } from "../components/ui";
+import { Failed, Pic, Price, ProductCard, Skeleton } from "../components/ui";
 
 export default function Product() {
   const { id } = useParams();
@@ -17,7 +17,7 @@ export default function Product() {
   const load = () => {
     setFailed(false);
     setD(null);
-    api(`products/${id}/`).then(setD).catch(() => setFailed(true));
+    api(`products/${id}/`).then(setD).catch((e) => setFailed(e || true));
   };
   useEffect(load, [id, lang]);
   const p = d && d.product;
@@ -40,12 +40,12 @@ export default function Product() {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        {failed ? <div style={{ paddingTop: 80 }}><Failed onRetry={load} /></div> : !p ? (
+        {failed ? <div style={{ paddingTop: 80 }}><Failed onRetry={load} error={failed} /></div> : !p ? (
           <div className="pm-pad" style={{ paddingTop: 70 }}><Skeleton h={320} n={1} grid={false} /><Skeleton h={30} n={3} grid={false} /></div>
         ) : (
           <>
             <div className="pm-gallery" onScroll={(e) => setSlide(Math.round(e.target.scrollLeft / e.target.clientWidth))}>
-              {(p.images.length ? p.images : [""]).map((src, i) => <img key={i} src={src} alt="" />)}
+              {(p.images.length ? p.images : [""]).map((src, i) => <Pic key={i} src={src} lazy={i > 0} />)}
             </div>
             <div className="pm-sheet">
               {p.images.length > 1 && (

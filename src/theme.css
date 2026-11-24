@@ -153,6 +153,12 @@ body.dark .pm-card .img { background: #1b2a20; }
 .pm-gallery { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; background: #fff; }
 body.dark .pm-gallery { background: #10180f; }
 .pm-gallery img { flex: 0 0 100%; width: 100%; aspect-ratio: 1; object-fit: contain; scroll-snap-align: center; }
+/* no photo → soft placeholder with the proMaster mark */
+.pm-noimg { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #eef5ef, #f7faf7); }
+.pm-noimg img { width: 34% !important; height: auto !important; opacity: .22; filter: grayscale(1); border-radius: 18%; }
+body.dark .pm-noimg { background: linear-gradient(135deg, #18241b, #1d2b21); }
+.pm-gallery .pm-noimg { flex: 0 0 100%; aspect-ratio: 1; scroll-snap-align: center; }
 .pm-sheet {
   background: var(--pm-card); border-radius: 26px 26px 0 0; margin-top: -24px; position: relative;
   padding: 20px 18px 120px; min-height: 50vh;

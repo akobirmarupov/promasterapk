@@ -46,6 +46,20 @@ export function Price({ p, big }) {
   );
 }
 
+// Product photo; no photo (or it fails to load) → a soft placeholder with the proMaster mark instead of an empty box
+export function Pic({ src, className = "", lazy = true }) {
+  const [bad, setBad] = React.useState(!src);
+  React.useEffect(() => setBad(!src), [src]);
+  if (bad) {
+    return (
+      <div className={`pm-noimg ${className}`} aria-hidden="true">
+        <img src="/icon.png" alt="" />
+      </div>
+    );
+  }
+  return <img className={className} src={src} alt="" loading={lazy ? "lazy" : undefined} onError={() => setBad(true)} />;
+}
+
 export function ProductCard({ p }) {
   const { add, qtyOf, t } = useStore();
   const router = useIonRouter();
@@ -54,7 +68,7 @@ export function ProductCard({ p }) {
   return (
     <div className="pm-card" onClick={() => router.push(`/product/${p.id}`)}>
       <div className="img">
-        {p.image ? <img src={p.image} alt="" loading="lazy" /> : null}
+        <Pic src={p.image} />
         {p.discount > 0 ? <span className="pm-tag">−{p.discount}%</span> : p.is_new ? <span className="pm-tag new">NEW</span> : null}
         <button
           className={`pm-add${inCart ? " on" : ""}`}
@@ -88,12 +102,15 @@ export function Skeleton({ h = 180, n = 4, grid = true }) {
   );
 }
 
-export function Failed({ onRetry }) {
+// error: the ApiError (or true) — network problems, "not found" and server errors get different texts
+export function Failed({ onRetry, error }) {
   const { t } = useStore();
+  const status = error && typeof error === "object" ? error.status : 0;
+  const text = status === 404 ? t("notFound") : status >= 500 ? t("serverErr") : t("noNet");
   return (
     <div className="pm-empty">
       <div className="big"><IonIcon icon={cloudOfflineOutline} /></div>
-      <h3>{t("noNet")}</h3>
+      <h3>{text}</h3>
       <button className="pm-btn" style={{ maxWidth: 220, margin: "16px auto 0" }} onClick={onRetry}>{t("retry")}</button>
     </div>
   );
