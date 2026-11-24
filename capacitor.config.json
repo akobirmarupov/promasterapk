@@ -1,0 +1,17 @@
+{
+  "appId": "uz.promaster.app",
+  "appName": "proMaster",
+  "webDir": "dist",
+  "android": {
+    "backgroundColor": "#0E3B1F"
+  },
+  "plugins": {
+    "CapacitorHttp": { "enabled": true },
+    "SplashScreen": {
+      "launchShowDuration": 900,
+      "backgroundColor": "#0E3B1F",
+      "showSpinner": false,
+      "androidScaleType": "CENTER_INSIDE"
+    }
+  }
+}

@@ -1,0 +1,68 @@
+name: Build proMaster app
+
+# Builds on GitHub's servers — nothing is installed on your computer.
+#  * every push / manual run: a debug APK to install on a phone and test;
+#  * when the signing secrets are set: a signed AAB (for Play Market) and a signed APK.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Web part (Ionic + React)
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+          npx cap sync android
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Debug APK (for testing on a phone)
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug
+
+      - name: Signed release — AAB for Play Market + APK
+        working-directory: android
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ]; then
+            echo "::notice::Signing secrets are not set — only the debug APK was built."
+            exit 0
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > app/release.p12
+          ./gradlew --no-daemon bundleRelease assembleRelease
+          rm -f app/release.p12
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: proMaster-debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: proMaster-release-play-market
+          path: |
+            android/app/build/outputs/bundle/release/*.aab
+            android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: ignore

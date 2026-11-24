@@ -1,0 +1,13 @@
+.gradle/
+build/
+app/build/
+local.properties
+*.iml
+.idea/
+# signing keys never go to git
+*.p12
+*.jks
+*.keystore
+node_modules/
+dist/
+android/app/release.p12

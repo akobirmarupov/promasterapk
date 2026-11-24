@@ -1,0 +1,100 @@
+import React from "react";
+import { IonBackButton, IonButtons, IonHeader, IonTitle, IonToolbar, useIonRouter, useIonToast } from "@ionic/react";
+import {
+  addOutline, buildOutline, checkmarkOutline, cloudOfflineOutline, constructOutline, cubeOutline, flashOutline,
+  homeOutline, leafOutline, resizeOutline, waterOutline,
+} from "ionicons/icons";
+import { IonIcon } from "@ionic/react";
+import { money } from "../api";
+import { useStore } from "../store";
+
+// the site's category icon keys → app icons
+const CAT_ICONS = {
+  power: flashOutline, hand: constructOutline, measure: resizeOutline, plumb: waterOutline,
+  garden: leafOutline, fast: buildOutline, house: homeOutline, furniture: cubeOutline,
+};
+export const catIcon = (k) => CAT_ICONS[k] || cubeOutline;
+
+export function Header({ title, back = "/home", end }) {
+  return (
+    <IonHeader className="ion-no-border">
+      <IonToolbar>
+        <IonButtons slot="start">
+          <IonBackButton defaultHref={back} text="" />
+        </IonButtons>
+        <IonTitle style={{ fontWeight: 800 }}>{title}</IonTitle>
+        {end && <IonButtons slot="end">{end}</IonButtons>}
+      </IonToolbar>
+    </IonHeader>
+  );
+}
+
+export function Price({ p, big }) {
+  if (big) {
+    return (
+      <div>
+        <span className="pm-price" style={{ fontSize: 26 }}>{money(p.price)}</span>
+        {p.old_price > 0 && <span className="pm-old">{money(p.old_price)}</span>}
+      </div>
+    );
+  }
+  return (
+    <div>
+      {p.old_price > 0 && <div className="pm-old" style={{ marginLeft: 0 }}>{money(p.old_price)}</div>}
+      <div className="pm-price">{money(p.price)}</div>
+    </div>
+  );
+}
+
+export function ProductCard({ p }) {
+  const { add, qtyOf, t } = useStore();
+  const router = useIonRouter();
+  const [toast] = useIonToast();
+  const inCart = qtyOf(p.id) > 0;
+  return (
+    <div className="pm-card" onClick={() => router.push(`/product/${p.id}`)}>
+      <div className="img">
+        {p.image ? <img src={p.image} alt="" loading="lazy" /> : null}
+        {p.discount > 0 ? <span className="pm-tag">−{p.discount}%</span> : p.is_new ? <span className="pm-tag new">NEW</span> : null}
+        <button
+          className={`pm-add${inCart ? " on" : ""}`}
+          aria-label={t("addToCart")}
+          onClick={(e) => {
+            e.stopPropagation();
+            add(p);
+            toast({ message: t("added"), duration: 1200, position: "top", color: "secondary" });
+          }}
+        >
+          <IonIcon icon={inCart ? checkmarkOutline : addOutline} />
+        </button>
+      </div>
+      <div className="body">
+        {p.brand && <div className="brand">{p.brand}</div>}
+        <div className="name">{p.name}</div>
+        <Price p={p} />
+        {!p.in_stock && <div className="pm-off">{t("byOrder")}</div>}
+      </div>
+    </div>
+  );
+}
+
+export function Skeleton({ h = 180, n = 4, grid = true }) {
+  return (
+    <div className={grid ? "pm-grid" : ""}>
+      {Array.from({ length: n }).map((_, i) => (
+        <div key={i} className="pm-skel" style={{ height: h, marginBottom: grid ? 0 : 12 }} />
+      ))}
+    </div>
+  );
+}
+
+export function Failed({ onRetry }) {
+  const { t } = useStore();
+  return (
+    <div className="pm-empty">
+      <div className="big"><IonIcon icon={cloudOfflineOutline} /></div>
+      <h3>{t("noNet")}</h3>
+      <button className="pm-btn" style={{ maxWidth: 220, margin: "16px auto 0" }} onClick={onRetry}>{t("retry")}</button>
+    </div>
+  );
+}

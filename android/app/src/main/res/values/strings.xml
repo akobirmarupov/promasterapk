@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">proMaster</string>
+    <string name="title_activity_main">proMaster</string>
+    <string name="package_name">uz.promaster.app</string>
+    <string name="custom_url_scheme">uz.promaster.app</string>
+</resources>
