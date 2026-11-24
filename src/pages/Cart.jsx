@@ -3,6 +3,7 @@ import { IonButton, IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolba
 import { bagHandleOutline, trashOutline } from "ionicons/icons";
 import { money } from "../api";
 import { useStore } from "../store";
+import { Bell } from "../components/ui";
 
 export default function Cart() {
   const { t, cart, setQty, total, count, clearCart } = useStore();
@@ -12,7 +13,10 @@ export default function Cart() {
       <IonHeader className="ion-no-border">
         <IonToolbar>
           <IonTitle style={{ fontWeight: 800, fontSize: 22 }}>{t("cart")}</IonTitle>
-          {cart.length > 0 && <IonButton slot="end" fill="clear" color="medium" onClick={clearCart}>{t("clear")}</IonButton>}
+          <div slot="end" style={{ display: "flex", alignItems: "center", marginRight: 8 }}>
+            {cart.length > 0 && <IonButton fill="clear" color="medium" onClick={clearCart}>{t("clear")}</IonButton>}
+            <Bell plain />
+          </div>
         </IonToolbar>
       </IonHeader>
       <IonContent>

@@ -2,7 +2,7 @@ import React from "react";
 import { IonBackButton, IonButtons, IonHeader, IonTitle, IonToolbar, useIonRouter, useIonToast } from "@ionic/react";
 import {
   addOutline, buildOutline, checkmarkOutline, cloudOfflineOutline, constructOutline, cubeOutline, flashOutline,
-  homeOutline, leafOutline, resizeOutline, waterOutline,
+  homeOutline, leafOutline, notificationsOutline, resizeOutline, waterOutline,
 } from "ionicons/icons";
 import { IonIcon } from "@ionic/react";
 import { money } from "../api";
@@ -15,7 +15,21 @@ const CAT_ICONS = {
 };
 export const catIcon = (k) => CAT_ICONS[k] || cubeOutline;
 
-export function Header({ title, back = "/home", end }) {
+// 🔔 with the number of unread notifications — at the top of every page
+export function Bell({ plain }) {
+  const { badges, customer, t } = useStore();
+  const router = useIonRouter();
+  const n = badges.notifications + badges.support;
+  return (
+    <button className={`pm-iconbtn${plain ? " plain" : ""}`} aria-label={t("notifications")}
+      onClick={() => router.push(customer ? "/notifications" : "/login")}>
+      <IonIcon icon={notificationsOutline} />
+      {n > 0 && <span className="dot">{n > 99 ? "99+" : n}</span>}
+    </button>
+  );
+}
+
+export function Header({ title, back = "/home", end, bell = true }) {
   return (
     <IonHeader className="ion-no-border">
       <IonToolbar>
@@ -23,7 +37,7 @@ export function Header({ title, back = "/home", end }) {
           <IonBackButton defaultHref={back} text="" />
         </IonButtons>
         <IonTitle style={{ fontWeight: 800 }}>{title}</IonTitle>
-        {end && <IonButtons slot="end">{end}</IonButtons>}
+        {(end || bell) && <IonButtons slot="end" style={{ gap: 6, marginRight: 8 }}>{end}{bell && <Bell plain />}</IonButtons>}
       </IonToolbar>
     </IonHeader>
   );

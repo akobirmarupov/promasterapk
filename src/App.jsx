@@ -22,6 +22,8 @@ import Addresses from "./pages/Addresses";
 import Settings from "./pages/Settings";
 import TextPage from "./pages/TextPage";
 import Drawer from "./components/Drawer";
+import Notifications from "./pages/Notifications";
+import Support from "./pages/Support";
 
 export default function App() {
   const { t, count } = useStore();
@@ -50,6 +52,8 @@ export default function App() {
             <Route exact path="/profile/addresses" component={Addresses} />
             <Route exact path="/profile/settings" component={Settings} />
             <Route exact path="/page/:key" component={TextPage} />
+            <Route exact path="/notifications" component={Notifications} />
+            <Route exact path="/support" component={Support} />
             <Route exact path="/"><Redirect to="/home" /></Route>
           </IonRouterOutlet>
           <IonTabBar slot="bottom">

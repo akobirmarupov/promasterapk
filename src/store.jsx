@@ -1,5 +1,5 @@
 // App state: cart, signed-in customer, language, the unfinished Telegram confirmation, the side menu.
-// Kept on the phone (localStorage). The app is always light (no dark mode).
+// Kept on the phone (localStorage). Light by default; dark mode is the customer's choice. Badges = unread 🔔 / 💬.
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { api, hasToken, setApiLang, setToken } from "./api";
 import { ERR, T } from "./i18n";
@@ -22,6 +22,8 @@ export function StoreProvider({ children }) {
     return p && p.expires && new Date(p.expires) > new Date() ? p : null;
   });
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dark, setDarkState] = useState(() => load("pm-dark2", false)); // new key: the old switch is not inherited
+  const [badges, setBadges] = useState({ notifications: 0, support: 0 });
   const [cart, setCart] = useState(() => load("pm-cart", []));  // [{id, name, price, image, qty}]
   const [customer, setCustomer] = useState(null);
   const [ready, setReady] = useState(!hasToken());
@@ -29,9 +31,29 @@ export function StoreProvider({ children }) {
   setApiLang(lang);
   useEffect(() => localStorage.setItem("pm-cart", JSON.stringify(cart)), [cart]);
   useEffect(() => {
-    localStorage.removeItem("pm-dark"); // the old dark-mode switch is gone
-    document.body.classList.remove("dark");
+    localStorage.removeItem("pm-dark");
+    document.body.classList.toggle("dark", !!dark);
+    localStorage.setItem("pm-dark2", JSON.stringify(!!dark));
+  }, [dark]);
+  // red numbers on 🔔 and 💬 — asked every 30 s while signed in (and at once when the app comes back)
+  const refreshBadges = useCallback(() => {
+    if (!hasToken()) return;
+    api("me/badges/").then(setBadges).catch(() => {});
   }, []);
+  useEffect(() => {
+    if (!customer) {
+      setBadges({ notifications: 0, support: 0 });
+      return undefined;
+    }
+    refreshBadges();
+    const id = setInterval(refreshBadges, 30000);
+    const onVisible = () => document.visibilityState === "visible" && refreshBadges();
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [customer, refreshBadges]);
   useEffect(() => {
     if (pending) localStorage.setItem("pm-pending", JSON.stringify(pending));
     else localStorage.removeItem("pm-pending");
@@ -59,6 +81,10 @@ export function StoreProvider({ children }) {
       setPending: setPendingState,
       menuOpen,
       setMenuOpen,
+      dark,
+      setDark: setDarkState,
+      badges,
+      refreshBadges,
       setLang(l) {
         localStorage.setItem("pm-lang", l);
         setApiLang(l);
@@ -101,7 +127,7 @@ export function StoreProvider({ children }) {
         setCustomer(null);
       },
     }),
-    [lang, t, tErr, ready, pending, menuOpen, cart, customer]
+    [lang, t, tErr, ready, pending, menuOpen, dark, badges, refreshBadges, cart, customer]
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

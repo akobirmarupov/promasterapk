@@ -1,42 +1,85 @@
+// Profile: who I am, my data / orders / addresses, support, the shop's contacts.
+// Top right: 🔔 and ⋮ — the ⋮ menu holds language, dark/light mode, the info pages and «Chiqish».
 import React, { useEffect, useState } from "react";
-import { IonContent, IonIcon, IonPage, useIonRouter } from "@ionic/react";
+import { IonContent, IonIcon, IonPage, useIonActionSheet, useIonRouter } from "@ionic/react";
 import {
-  callOutline, chevronForward, documentTextOutline, informationCircleOutline, locationOutline, logOutOutline,
-  logoInstagram, paperPlaneOutline, personOutline, receiptOutline, settingsOutline, shieldCheckmarkOutline, timeOutline,
+  callOutline, chatbubblesOutline, chevronForward, ellipsisVertical, locationOutline, logoInstagram, notificationsOutline,
+  paperPlaneOutline, personOutline, receiptOutline, timeOutline,
 } from "ionicons/icons";
 import { Browser } from "@capacitor/browser";
 import { api } from "../api";
 import { useStore } from "../store";
+import { Bell } from "../components/ui";
 import Verify from "../components/Verify";
 
 const openUrl = (url) => Browser.open({ url }).catch(() => window.open(url, "_blank"));
 
-export default function Profile() {
-  const { t, lang, customer, signOut, pending } = useStore();
+export function useProfileMenu() {
+  // the ⋮ menu (also used from the side menu)
+  const { t, lang, setLang, dark, setDark, customer, signOut } = useStore();
   const router = useIonRouter();
+  const [sheet] = useIonActionSheet();
+  const chooseLang = () =>
+    sheet({
+      header: t("language"),
+      buttons: [
+        { text: `${lang === "uz" ? "✓ " : ""}O'zbekcha`, handler: () => setLang("uz") },
+        { text: `${lang === "ru" ? "✓ " : ""}Русский`, handler: () => setLang("ru") },
+        { text: t("cancel"), role: "cancel" },
+      ],
+    });
+  return () =>
+    sheet({
+      header: t("more"),
+      buttons: [
+        { text: `🌐 ${t("language")}: ${lang === "ru" ? "Русский" : "O'zbekcha"}`, handler: () => setTimeout(chooseLang, 250) },
+        { text: dark ? `☀️ ${t("lightMode")}` : `🌙 ${t("darkMode")}`, handler: () => setDark(!dark) },
+        { text: `🔔 ${t("notifications")}`, handler: () => router.push(customer ? "/notifications" : "/login") },
+        { text: `💬 ${t("support")}`, handler: () => router.push("/support") },
+        { text: `ℹ️ ${t("aboutUs")}`, handler: () => router.push("/page/about") },
+        { text: `🚚 ${t("deliveryInfo")}`, handler: () => router.push("/page/delivery") },
+        { text: `🛡 ${t("returns")}`, handler: () => router.push("/page/returns") },
+        { text: `🔒 ${t("privacy")}`, handler: () => router.push("/page/privacy") },
+        { text: `📄 ${t("offer")}`, handler: () => router.push("/page/offer") },
+        ...(customer ? [{ text: `🚪 ${t("logout")}`, role: "destructive", handler: () => signOut() }] : []),
+        { text: t("cancel"), role: "cancel" },
+      ],
+    });
+}
+
+export default function Profile() {
+  const { t, lang, customer, pending, badges } = useStore();
+  const router = useIonRouter();
+  const openMenu = useProfileMenu();
   const [store, setStore] = useState(null);
   useEffect(() => {
     api("home/").then((d) => setStore(d.store)).catch(() => {});
   }, [lang]);
   const initials = customer && customer.name ? customer.name.trim()[0].toUpperCase() : "👤";
   const tg = store && store.telegram ? store.telegram.replace(/^@/, "") : "";
-  const ig = store && store.instagram ? store.instagram.replace(/^@/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//, "") : "";
-  const Row = ({ icon, label, sub, onClick }) => (
+  const ig = store && store.instagram ? store.instagram.replace(/^@/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, "") : "";
+  const Row = ({ icon, label, sub, onClick, badge }) => (
     <button onClick={onClick}>
       <span className="ic"><IonIcon icon={icon} /></span>{label}
+      {badge > 0 && <span className="pm-count">{badge}</span>}
       <span className="sub">{sub}</span>
       <IonIcon icon={chevronForward} style={{ color: "var(--pm-muted)" }} />
     </button>
   );
+  const need = (path) => router.push(customer ? path : "/login");
   return (
     <IonPage>
       <IonContent>
         <div className="pm-profile-head">
+          <div className="pm-head-actions" style={{ justifyContent: "flex-end", marginBottom: 10 }}>
+            <Bell />
+            <button className="pm-iconbtn" aria-label={t("more")} onClick={openMenu}><IonIcon icon={ellipsisVertical} /></button>
+          </div>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <div className="pm-avatar">{initials}</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 20, fontWeight: 800 }}>{customer ? customer.name || customer.phone : t("guest")}</div>
-              <div style={{ opacity: 0.8, fontSize: 14 }}>{customer ? customer.phone : t("guestHint")}</div>
+              <div style={{ opacity: 0.85, fontSize: 14 }}>{customer ? customer.phone : t("guestHint")}</div>
             </div>
           </div>
           {!customer && !pending && (
@@ -54,10 +97,11 @@ export default function Profile() {
         )}
 
         <div className="pm-menu">
-          <Row icon={personOutline} label={t("personal")} sub={customer ? customer.name : ""} onClick={() => router.push(customer ? "/profile/settings" : "/login")} />
-          <Row icon={receiptOutline} label={t("myOrders")} onClick={() => router.push(customer ? "/profile/orders" : "/login")} />
-          <Row icon={locationOutline} label={t("addresses")} onClick={() => router.push(customer ? "/profile/addresses" : "/login")} />
-          <Row icon={settingsOutline} label={t("language")} sub={lang === "ru" ? "Русский" : "O'zbekcha"} onClick={() => router.push("/profile/settings")} />
+          <Row icon={personOutline} label={t("personal")} sub={customer ? customer.name : ""} onClick={() => need("/profile/settings")} />
+          <Row icon={receiptOutline} label={t("myOrders")} onClick={() => need("/profile/orders")} />
+          <Row icon={locationOutline} label={t("addresses")} onClick={() => need("/profile/addresses")} />
+          <Row icon={notificationsOutline} label={t("notifications")} badge={badges.notifications} onClick={() => need("/notifications")} />
+          <Row icon={chatbubblesOutline} label={t("support")} badge={badges.support} onClick={() => router.push("/support")} />
         </div>
 
         {store && (
@@ -69,23 +113,7 @@ export default function Profile() {
             {store.address && <Row icon={locationOutline} label={store.address} onClick={() => store.lat && openUrl(`https://yandex.uz/maps/?pt=${store.lng},${store.lat}&z=17&l=map`)} />}
           </div>
         )}
-
-        <div className="pm-menu">
-          <Row icon={informationCircleOutline} label={t("aboutUs")} onClick={() => router.push("/page/about")} />
-          <Row icon={documentTextOutline} label={t("deliveryInfo")} onClick={() => router.push("/page/delivery")} />
-          <Row icon={shieldCheckmarkOutline} label={t("returns")} onClick={() => router.push("/page/returns")} />
-          <Row icon={documentTextOutline} label={t("privacy")} onClick={() => router.push("/page/privacy")} />
-          <Row icon={documentTextOutline} label={t("offer")} onClick={() => router.push("/page/offer")} />
-        </div>
-
-        {customer && (
-          <div className="pm-menu">
-            <button onClick={signOut} style={{ color: "#d92d20" }}>
-              <span className="ic" style={{ background: "#ffe8e8", color: "#d92d20" }}><IonIcon icon={logOutOutline} /></span>{t("logout")}
-            </button>
-          </div>
-        )}
-        <p className="pm-muted" style={{ textAlign: "center", fontSize: 12, marginBottom: 24 }}>proMaster · {t("version")} 1.1</p>
+        <p className="pm-muted" style={{ textAlign: "center", fontSize: 12, marginBottom: 24 }}>proMaster · {t("version")} 1.2</p>
       </IonContent>
     </IonPage>
   );

@@ -6,7 +6,7 @@ import {
 import { useLocation } from "react-router-dom";
 import { api } from "../api";
 import { useStore } from "../store";
-import { Failed, ProductCard, Skeleton } from "../components/ui";
+import { Bell, Failed, ProductCard, Skeleton } from "../components/ui";
 
 export default function Products() {
   const { t, lang } = useStore();
@@ -60,6 +60,7 @@ export default function Products() {
         <IonToolbar>
           <IonButtons slot="start"><IonBackButton defaultHref="/catalog" text="" /></IonButtons>
           <IonSearchbar ref={search} placeholder={t("search")} debounce={350} value={q} onIonInput={(e) => setQ(e.detail.value || "")} style={{ paddingTop: 10 }} />
+          <div slot="end" style={{ marginRight: 8 }}><Bell plain /></div>
         </IonToolbar>
         <div className="pm-chips" style={{ background: "var(--pm-bg)" }}>
           {chips.map((c) => (

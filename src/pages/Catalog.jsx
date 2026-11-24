@@ -3,7 +3,7 @@ import { IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar, useIonRo
 import { chevronForward, searchOutline } from "ionicons/icons";
 import { api } from "../api";
 import { useStore } from "../store";
-import { catIcon, Failed, Skeleton } from "../components/ui";
+import { Bell, catIcon, Failed, Skeleton } from "../components/ui";
 
 export default function Catalog() {
   const { t, lang } = useStore();
@@ -18,7 +18,8 @@ export default function Catalog() {
   return (
     <IonPage>
       <IonHeader className="ion-no-border">
-        <IonToolbar><IonTitle style={{ fontWeight: 800, fontSize: 22 }}>{t("catalog")}</IonTitle></IonToolbar>
+        <IonToolbar><IonTitle style={{ fontWeight: 800, fontSize: 22 }}>{t("catalog")}</IonTitle>
+          <div slot="end" style={{ marginRight: 10 }}><Bell plain /></div></IonToolbar>
       </IonHeader>
       <IonContent>
         <div className="pm-pad">

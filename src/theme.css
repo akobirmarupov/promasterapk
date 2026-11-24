@@ -1,6 +1,6 @@
 /* proMaster app look: deep forest green + fresh lime, soft cards, big rounded images. Not the website's style. */
 :root {
-  color-scheme: light only; /* always light — even when the phone is in night mode */
+  color-scheme: light; /* light by default; «Qorong'u rejim» is the customer's choice (Profile ⋮) */
   --pm-forest: #23801c; /* main dark accent — a fresh, not-too-dark green */
   --pm-green: #37b10e;
   --pm-lime: #8bd450;
@@ -295,3 +295,78 @@ button { font-family: inherit; cursor: pointer; border: 0; }
 .pm-hero h1, .pm-hero p, .pm-hero .brand b { text-shadow: 0 1px 6px rgba(0, 60, 0, .18); }
 .pm-link { display: block; margin: 14px auto 0; background: none; color: var(--pm-muted); font-weight: 600; font-size: 14px;
   text-decoration: underline; }
+
+/* ---------- «Qorong'u rejim» (the customer turns it on in Profile ⋮; default is light) ---------- */
+body.dark {
+  color-scheme: dark;
+  --pm-bg: #0d1410;
+  --pm-card: #162119;
+  --pm-text: #e8f0e9;
+  --pm-muted: #9aaa9d;
+  --pm-line: #24332a;
+  --ion-background-color: var(--pm-bg);
+  --ion-text-color: var(--pm-text);
+  --ion-toolbar-background: var(--pm-bg);
+  --ion-tab-bar-background: rgba(22, 33, 25, 0.96);
+  --ion-item-background: var(--pm-card);
+  --ion-color-step-50: #18241c; --ion-color-step-100: #1d2b22; --ion-color-step-150: #22322a;
+  --ion-color-step-200: #283a30; --ion-color-step-400: #4f6356; --ion-color-step-600: #8a9a8e; --ion-color-step-850: #d6e0d8;
+}
+body.dark .pm-hero { background: linear-gradient(180deg, #2f8f19 0%, #2a7a1b 38%, #1d4f1a 68%, #142a17 86%, var(--pm-bg) 100%); }
+body.dark .pm-profile-head { background: linear-gradient(180deg, #2f8f19 0%, #2a7a1b 45%, #1d4f1a 75%, #142a17 90%, var(--pm-bg) 100%); }
+body.dark .pm-search { background: #1b2a20; color: #9aaa9d; }
+body.dark .pm-cat .ic, body.dark .pm-menu .ic, body.dark .pm-badge { background: #1f3326; color: var(--pm-lime); }
+body.dark .pm-card .img, body.dark .pm-gallery { background: #1b2a20; }
+body.dark .pm-noimg { background: linear-gradient(135deg, #18241b, #1d2b21); }
+body.dark .pm-error { background: #3a1616; color: #ffb4ab; }
+body.dark .pm-skel { background: linear-gradient(90deg, #18241c 25%, #213128 50%, #18241c 75%); background-size: 200% 100%; }
+body.dark .pm-card, body.dark .pm-menu, body.dark .pm-box, body.dark .pm-order, body.dark .pm-line,
+body.dark .pm-summary, body.dark .pm-cat { border-color: var(--pm-line); box-shadow: none; }
+body.dark .pm-banner { background: #1b2a20; }
+body.dark .pm-drawer { background: var(--pm-card); }
+body.dark .pm-verify { background: var(--pm-card); }
+body.dark .pm-code, body.dark .pm-addr { background: var(--pm-bg); color: var(--pm-text); }
+body.dark .pm-addr.on { background: #1b3020; }
+body.dark .pm-kv input { background: var(--pm-bg); }
+body.dark .pm-edit { background: #1f3326; color: var(--pm-lime); }
+body.dark .pm-bubble.me { background: #24572a; }
+body.dark .pm-bubble.shop { background: var(--pm-card); }
+body.dark .pm-notif.unread { background: #18301d; }
+
+/* 🔔 bell (every page top), ⋮ button, badges */
+.pm-iconbtn { position: relative; width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center;
+  font-size: 23px; background: rgba(255,255,255,.18); color: #fff; flex: none; }
+.pm-iconbtn.plain { background: transparent; color: var(--pm-text); }
+.pm-iconbtn .dot { position: absolute; top: 4px; right: 3px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px;
+  background: #f04438; color: #fff; font-size: 11px; font-weight: 800; display: grid; place-items: center;
+  border: 2px solid #fff; }
+.pm-head-actions { display: flex; gap: 8px; margin-left: auto; }
+
+/* notifications list */
+.pm-notif { display: flex; gap: 12px; padding: 14px; border-radius: 16px; background: var(--pm-card); margin-bottom: 10px;
+  border: 1px solid var(--pm-line); }
+.pm-notif.unread { background: #f1f9ec; border-color: #cfe9c1; }
+.pm-notif .ic { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; flex: none; font-size: 20px;
+  background: #e8f5e1; color: var(--ion-color-primary); }
+.pm-notif b { display: block; font-size: 15px; }
+.pm-notif p { margin: 3px 0 4px; font-size: 14px; color: var(--pm-text); white-space: pre-line; }
+.pm-notif small { color: var(--pm-muted); font-size: 12px; }
+
+/* support chat */
+.pm-chat { display: flex; flex-direction: column; gap: 8px; padding: 14px 14px 110px; }
+.pm-bubble { max-width: 82%; padding: 10px 13px; border-radius: 18px; font-size: 15px; line-height: 1.4; white-space: pre-line; }
+.pm-bubble small { display: block; margin-top: 4px; font-size: 11px; opacity: .65; }
+.pm-bubble.me { align-self: flex-end; background: #dff3d4; border-bottom-right-radius: 6px; }
+.pm-bubble.shop { align-self: flex-start; background: #f2f5f1; border: 1px solid var(--pm-line); border-bottom-left-radius: 6px; }
+.pm-chat-hint { text-align: center; color: var(--pm-muted); font-size: 13.5px; margin: 6px 10px 10px; }
+.pm-composer { position: fixed; left: 0; right: 0; bottom: 62px; display: flex; gap: 8px; padding: 10px 12px;
+  background: var(--pm-bg); border-top: 1px solid var(--pm-line); z-index: 10; }
+.pm-composer textarea { flex: 1; resize: none; border-radius: 18px; border: 1.5px solid var(--pm-line); padding: 10px 14px;
+  font-size: 15px; background: var(--pm-card); color: var(--pm-text); outline: none; max-height: 110px; }
+.pm-composer button { width: 46px; height: 46px; border-radius: 50%; background: var(--ion-color-primary); color: #fff;
+  font-size: 21px; display: grid; place-items: center; align-self: flex-end; }
+.pm-composer button:disabled { opacity: .45; }
+.pm-count { min-width: 22px; height: 22px; padding: 0 7px; border-radius: 11px; background: #f04438; color: #fff;
+  font-size: 12px; font-weight: 800; display: inline-grid; place-items: center; margin-left: 8px; }
+.pm-drawer nav button .pm-count { margin-left: auto; }
+.pm-profile-head .pm-head-actions { display: flex; }

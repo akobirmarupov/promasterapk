@@ -4,7 +4,7 @@ import { menuOutline, searchOutline } from "ionicons/icons";
 import { Browser } from "@capacitor/browser";
 import { api } from "../api";
 import { useStore } from "../store";
-import { Failed, ProductCard, Skeleton } from "../components/ui";
+import { Bell, Failed, ProductCard, Skeleton } from "../components/ui";
 
 export default function Home() {
   const { t, lang, customer, setMenuOpen } = useStore();
@@ -39,7 +39,10 @@ export default function Home() {
         <div className="pm-hero">
           <div className="brand">
             <img src="/icon.png" alt="" /><b>proMaster</b>
-            <button className="pm-burger" aria-label={t("menu")} onClick={() => setMenuOpen(true)}><IonIcon icon={menuOutline} /></button>
+            <span className="pm-head-actions">
+              <Bell />
+              <button className="pm-iconbtn" aria-label={t("menu")} onClick={() => setMenuOpen(true)}><IonIcon icon={menuOutline} /></button>
+            </span>
           </div>
           <h1>{t("hello")}{first ? `, ${first}` : ""}!</h1>
           <p>{lang === "ru" ? "Инструменты и хозтовары — с доставкой" : "Asbob-uskuna va xo'jalik mollari — yetkazib berish bilan"}</p>

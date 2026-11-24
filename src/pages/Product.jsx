@@ -4,7 +4,7 @@ import { bagAddOutline, checkmarkCircle, flashOutline, shareSocialOutline } from
 import { useParams } from "react-router-dom";
 import { api } from "../api";
 import { useStore } from "../store";
-import { Failed, Pic, Price, ProductCard, Skeleton } from "../components/ui";
+import { Bell, Failed, Pic, Price, ProductCard, Skeleton } from "../components/ui";
 
 export default function Product() {
   const { id } = useParams();
@@ -30,6 +30,9 @@ export default function Product() {
       <IonHeader className="ion-no-border" style={{ position: "absolute" }}>
         <IonToolbar style={{ "--background": "transparent" }}>
           <IonButtons slot="start"><IonBackButton defaultHref="/home" text="" style={{ background: "rgba(255,255,255,.85)", borderRadius: 14 }} /></IonButtons>
+          <IonButtons slot="end">
+            <span style={{ background: "rgba(255,255,255,.85)", borderRadius: 14, marginRight: 6 }}><Bell plain /></span>
+          </IonButtons>
           {p && navigator.share && (
             <IonButtons slot="end">
               <button onClick={share} style={{ background: "rgba(255,255,255,.85)", borderRadius: 14, width: 40, height: 40, display: "grid", placeItems: "center", marginRight: 8 }}>
